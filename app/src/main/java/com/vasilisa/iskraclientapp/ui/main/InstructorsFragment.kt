@@ -64,7 +64,20 @@ class InstructorsFragment : Fragment(R.layout.fragment_instructors) {
 
                     InstructorList.add(pr)
                 }
-                val adapter = InstructorAdapter(InstructorList)
+                val adapter = InstructorAdapter(InstructorList) { instructor ->
+
+                    val fragment = InstructorProfileFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("instructorId", instructor.instructorId)
+                        }
+                    }
+
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+
                 recyclerViewInstructor.adapter = adapter
             }
 

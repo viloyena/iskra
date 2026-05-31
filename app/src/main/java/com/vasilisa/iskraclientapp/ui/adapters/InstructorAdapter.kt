@@ -9,7 +9,8 @@ import com.vasilisa.iskraclientapp.R
 import com.vasilisa.iskraclientapp.data.dto.InstructorDto
 
 class InstructorAdapter(
-    private val instructors: List<InstructorDto>
+    private val instructors: List<InstructorDto>,
+    private val onClick: (InstructorDto) -> Unit
 ) : RecyclerView.Adapter<InstructorAdapter.InstructorViewHolder>() {
 
     class InstructorViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -39,21 +40,16 @@ class InstructorAdapter(
         return InstructorViewHolder(view)
     }
 
-    override fun onBindViewHolder(
-        holder: InstructorViewHolder,
-        position: Int
-    ) {
-
+    override fun onBindViewHolder(holder: InstructorViewHolder, position: Int) {
         val instructor = instructors[position]
 
-        holder.nameText.text =
-            instructor.name
+        holder.nameText.text = instructor.name
+        holder.experienceText.text = "Опыт: ${instructor.experienceYears}"
+        holder.ratingText.text = "Рейтинг: ${instructor.rating}"
 
-        holder.experienceText.text =
-            "Опыт: ${instructor.experienceYears}"
-
-        holder.ratingText.text =
-            "Рейтинг: ${instructor.rating}"
+        holder.itemView.setOnClickListener {
+            onClick(instructor)
+        }
     }
 
     override fun getItemCount(): Int {

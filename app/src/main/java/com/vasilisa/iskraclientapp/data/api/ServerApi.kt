@@ -4,6 +4,7 @@ import com.vasilisa.iskraclientapp.data.dto.InstructorDto
 import com.vasilisa.iskraclientapp.data.dto.LoginRequestDto
 import com.vasilisa.iskraclientapp.data.dto.LoginResponseDto
 import com.vasilisa.iskraclientapp.data.dto.RegisterRequestDto
+import com.vasilisa.iskraclientapp.data.dto.ReviewDto
 import com.vasilisa.iskraclientapp.data.dto.SessionDto
 import com.vasilisa.iskraclientapp.data.dto.UserProfileDto
 import retrofit2.Call
@@ -46,4 +47,24 @@ interface ServerApi {
     fun cancelBooking(
         @Path("sessionId") sessionId: String
     ): Call<Void>
+
+    @POST("user/review")
+    fun postReview(
+        @Body dto: ReviewDto
+    ): Call<Void>
+
+    @DELETE("user/review/{instructorId}")
+    fun deleteReview(
+        @Path("instructorId") instructorId: String
+    ): Call<Void>
+
+    @GET("instructors/{instructorId}")
+    fun getInstructor(
+        @Path("instructorId") instructorId: String
+    ): Call<InstructorDto>
+
+    @GET("instructors/{instructorId}/reviews")
+    fun getReviews(
+        @Path("instructorId") instructorId: String
+    ): Call<List<ReviewDto>>
 }
