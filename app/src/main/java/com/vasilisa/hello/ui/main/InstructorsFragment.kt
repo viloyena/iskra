@@ -52,7 +52,7 @@ class InstructorsFragment : Fragment(R.layout.fragment_instructors) {
     }
 
     fun getInstructors() {
-        val request = RetrofitClient.api.getInstructors()
+        val request = RetrofitClient.create(requireContext()).getInstructors()
         request.enqueue(object : Callback<List<InstructorDto>> {
             override fun onResponse(
                 call: Call<List<InstructorDto>>,

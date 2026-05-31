@@ -6,5 +6,5 @@ data class RegisterRequestDto(
     val fullname: String,
     val phoneNumber: String,
     val birthDate: String,
-    val gender: Int
+    val gender: String
 )

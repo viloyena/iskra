@@ -5,6 +5,6 @@ data class UserProfileDto(
     val fullname: String,
     val email: String,
     val phoneNumber: String?,
-    val gender: Int,
+    val gender: String,
     val birthDate: String
 )

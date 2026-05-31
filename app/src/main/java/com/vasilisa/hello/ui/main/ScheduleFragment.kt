@@ -2,85 +2,115 @@ package com.vasilisa.hello.ui.main
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.hello.R
 import com.vasilisa.hello.data.api.RetrofitClient
-import com.vasilisa.hello.data.api.ServerApi
-import com.vasilisa.hello.data.dto.InstructorDto
 import com.vasilisa.hello.data.dto.SessionDto
 import com.vasilisa.hello.ui.adapters.SessionAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.collections.forEach
 
 class ScheduleFragment : Fragment(R.layout.fragment_schedule) {
-    var SessionList: MutableList<SessionDto> = mutableListOf();
-    lateinit var recyclerView: RecyclerView;
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    private val sessionList = mutableListOf<SessionDto>()
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: SessionAdapter
 
-        val view = inflater.inflate(
-            R.layout.fragment_schedule,
-            container,
-            false
-        )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        recyclerView =
-            view.findViewById<RecyclerView>(
-                R.id.rvSessions
-            )
+        recyclerView = view.findViewById(R.id.rvSessions)
 
         recyclerView.layoutManager =
             LinearLayoutManager(requireContext())
 
-        getSchedule();
+        adapter = SessionAdapter(sessionList) { session ->
+            bookSession(session.sessionId)
+        }
 
-        return view
+        recyclerView.adapter = adapter
+
+        getSchedule()
     }
 
-    fun getSchedule() {
-        val request = RetrofitClient.api.getSchedule() //создание, но не выполнение!
-        request.enqueue(object : Callback<List<SessionDto>> {
-            override fun onResponse(
-                call: Call<List<SessionDto>>,
-                response: Response<List<SessionDto>>
-            ) {
-                val instructor: List<SessionDto> = (response.body() ?: mutableListOf())
-                instructor.forEach { pr ->
-                    Log.d(
-                        "WWW",
-                        pr.title.toString() + " "
-                                + pr.description.toString() + " "
-                                + pr.type.toString() + " "
-                                + pr.durationMins.toString() + " "
-                                + pr.startDate.toString()
-                                + pr.price.toString()
-                                + pr.instructor.toString()
-                                + pr.bookingsCount.toString()
-                    )
-                    SessionList.add(pr)
+    private fun getSchedule() {
+
+        RetrofitClient.create(requireContext())
+            .getSchedule()
+            .enqueue(object : Callback<List<SessionDto>> {
+
+                override fun onResponse(
+                    call: Call<List<SessionDto>>,
+                    response: Response<List<SessionDto>>
+                ) {
+
+                    val data = response.body() ?: emptyList()
+
+                    sessionList.clear()
+                    sessionList.addAll(data)
+
+                    adapter.notifyDataSetChanged()
                 }
-                // 4. Инициализация и подключение адаптера
-                val adapter = SessionAdapter(SessionList)
-                recyclerView.adapter = adapter
-            }
 
-            override fun onFailure(call: Call<List<SessionDto>>, t: Throwable) {
-                Log.d("WWW", "Error:\n" + t.message)
-            }
-        })
+                override fun onFailure(call: Call<List<SessionDto>>, t: Throwable) {
 
+                    Log.d("WWW", "Error: ${t.message}")
+                }
+            })
+    }
+
+    private fun bookSession(sessionId: String) {
+
+        RetrofitClient.create(requireContext())
+            .bookSession(sessionId)
+            .enqueue(object : Callback<Void> {
+
+                override fun onResponse(
+                    call: Call<Void>,
+                    response: Response<Void>
+                ) {
+
+                    if (response.isSuccessful) {
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Запись успешна",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        getSchedule() // обновить список
+
+                    } else if (response.code() == 404) {
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Сессия не найдена",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                    } else {
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Ошибка: ${response.code()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Ошибка сети: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 }

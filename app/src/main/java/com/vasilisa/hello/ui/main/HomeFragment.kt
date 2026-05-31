@@ -47,7 +47,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     fun getSessions() {
-        val request = RetrofitClient.api.getUserBookings() //создание, но не выполнение!
+        val request = RetrofitClient.create(requireContext()).getUserBookings() //создание, но не выполнение!
         request.enqueue(object : Callback<List<SessionDto>> {
             override fun onResponse(
                 call: Call<List<SessionDto>>,
@@ -69,7 +69,51 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     SessionList.add(pr)
                 }
                 // 4. Инициализация и подключение адаптера
-                val adapter = SessionAdapter(SessionList)
+                val adapter = SessionAdapter(SessionList) { session ->
+
+                    // действие при клике
+                    val context = requireContext()
+
+                    RetrofitClient.create(context)
+                        .bookSession(session.sessionId)
+                        .enqueue(object : retrofit2.Callback<Void> {
+
+                            override fun onResponse(
+                                call: retrofit2.Call<Void>,
+                                response: retrofit2.Response<Void>
+                            ) {
+
+                                if (response.isSuccessful) {
+
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Запись успешна",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+
+                                } else {
+
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Ошибка: ${response.code()}",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+
+                            override fun onFailure(
+                                call: retrofit2.Call<Void>,
+                                t: Throwable
+                            ) {
+
+                                android.widget.Toast.makeText(
+                                    context,
+                                    "Ошибка сети",
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        })
+                }
                 recyclerView.adapter = adapter
             }
 
