@@ -2,15 +2,13 @@ package com.vasilisa.hello.ui.main
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.hello.R
 import com.vasilisa.hello.data.api.RetrofitClient
-import com.vasilisa.hello.data.dto.InstructorDto
 import com.vasilisa.hello.data.dto.SessionDto
 import com.vasilisa.hello.ui.adapters.SessionAdapter
 import retrofit2.Call
@@ -18,108 +16,96 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
-    var SessionList: MutableList<SessionDto> = mutableListOf();
-    lateinit var recyclerView: RecyclerView;
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    private val sessionList = mutableListOf<SessionDto>()
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: SessionAdapter
 
-        val view = inflater.inflate(
-            R.layout.fragment_home,
-            container,
-            false
-        )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        recyclerView =
-            view.findViewById<RecyclerView>(
-                R.id.sessionRecycler
-            )
+        recyclerView = view.findViewById(R.id.sessionRecycler)
 
         recyclerView.layoutManager =
             LinearLayoutManager(requireContext())
 
-        getSessions()
+        adapter = SessionAdapter(
+            sessionList,
+            buttonText = "Отменить запись"
+        ) { session ->
+            cancelBooking(session.sessionId)
+        }
 
-        return view
+        recyclerView.adapter = adapter
+
+        getSessions()
     }
 
-    fun getSessions() {
-        val request = RetrofitClient.create(requireContext()).getUserBookings() //создание, но не выполнение!
-        request.enqueue(object : Callback<List<SessionDto>> {
-            override fun onResponse(
-                call: Call<List<SessionDto>>,
-                response: Response<List<SessionDto>>
-            ) {
-                val instructor: List<SessionDto> = (response.body() ?: mutableListOf())
-                instructor.forEach { pr ->
-                    Log.d(
-                        "WWW",
-                        pr.title.toString() + " "
-                                + pr.description.toString() + " "
-                                + pr.type.toString() + " "
-                                + pr.durationMins.toString() + " "
-                                + pr.startDate.toString()
-                                + pr.price.toString()
-                                + pr.instructor.toString()
-                                + pr.bookingsCount.toString()
-                    )
-                    SessionList.add(pr)
+    private fun getSessions() {
+
+        RetrofitClient.create(requireContext())
+            .getUserBookings()
+            .enqueue(object : Callback<List<SessionDto>> {
+
+                override fun onResponse(
+                    call: Call<List<SessionDto>>,
+                    response: Response<List<SessionDto>>
+                ) {
+
+                    val data = response.body() ?: emptyList()
+
+                    sessionList.clear()
+                    sessionList.addAll(data)
+
+                    adapter.notifyDataSetChanged()
                 }
-                // 4. Инициализация и подключение адаптера
-                val adapter = SessionAdapter(SessionList) { session ->
 
-                    // действие при клике
-                    val context = requireContext()
+                override fun onFailure(call: Call<List<SessionDto>>, t: Throwable) {
 
-                    RetrofitClient.create(context)
-                        .bookSession(session.sessionId)
-                        .enqueue(object : retrofit2.Callback<Void> {
-
-                            override fun onResponse(
-                                call: retrofit2.Call<Void>,
-                                response: retrofit2.Response<Void>
-                            ) {
-
-                                if (response.isSuccessful) {
-
-                                    android.widget.Toast.makeText(
-                                        context,
-                                        "Запись успешна",
-                                        android.widget.Toast.LENGTH_SHORT
-                                    ).show()
-
-                                } else {
-
-                                    android.widget.Toast.makeText(
-                                        context,
-                                        "Ошибка: ${response.code()}",
-                                        android.widget.Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-
-                            override fun onFailure(
-                                call: retrofit2.Call<Void>,
-                                t: Throwable
-                            ) {
-
-                                android.widget.Toast.makeText(
-                                    context,
-                                    "Ошибка сети",
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        })
+                    Log.d("WWW", "Error: ${t.message}")
                 }
-                recyclerView.adapter = adapter
-            }
+            })
+    }
 
-            override fun onFailure(call: Call<List<SessionDto>>, t: Throwable) {
-                Log.d("WWW", "Error:\n" + t.message)
-            }
-        })
+    private fun cancelBooking(sessionId: String) {
+
+        RetrofitClient.create(requireContext())
+            .cancelBooking(sessionId)
+            .enqueue(object : Callback<Void> {
+
+                override fun onResponse(
+                    call: Call<Void>,
+                    response: Response<Void>
+                ) {
+
+                    if (response.isSuccessful) {
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Запись отменена",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        getSessions() // обновляем список
+
+                    } else {
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Ошибка: ${response.code()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Ошибка сети: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 }

@@ -29,7 +29,10 @@ class ScheduleFragment : Fragment(R.layout.fragment_schedule) {
         recyclerView.layoutManager =
             LinearLayoutManager(requireContext())
 
-        adapter = SessionAdapter(sessionList) { session ->
+        adapter = SessionAdapter(
+            sessionList,
+            buttonText = "Записаться"
+        ) { session ->
             bookSession(session.sessionId)
         }
 

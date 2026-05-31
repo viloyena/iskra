@@ -11,7 +11,8 @@ import com.vasilisa.hello.data.dto.SessionDto
 
 class SessionAdapter(
     private val sessions: List<SessionDto>,
-    private val onBookClick: (SessionDto) -> Unit
+    private val buttonText: String,
+    private val onActionClick: (SessionDto) -> Unit
 ) : RecyclerView.Adapter<SessionAdapter.SessionViewHolder>() {
 
     class SessionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -37,8 +38,10 @@ class SessionAdapter(
         holder.instructorText.text = session.instructor.name
         holder.dateText.text = session.startDate
 
+        holder.actionButton.text = buttonText
+
         holder.actionButton.setOnClickListener {
-            onBookClick(session)
+            onActionClick(session)
         }
     }
 
