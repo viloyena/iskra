@@ -1,6 +1,7 @@
 package com.vasilisa.hello.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,11 +9,17 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.hello.R
+import com.vasilisa.hello.data.api.RetrofitClient
 import com.vasilisa.hello.data.dto.InstructorDto
 import com.vasilisa.hello.data.dto.SessionDto
 import com.vasilisa.hello.ui.adapters.SessionAdapter
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
+    var SessionList: MutableList<SessionDto> = mutableListOf();
+    lateinit var recyclerView: RecyclerView;
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,7 +33,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             false
         )
 
-        val recyclerView =
+        recyclerView =
             view.findViewById<RecyclerView>(
                 R.id.sessionRecycler
             )
@@ -34,46 +41,41 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         recyclerView.layoutManager =
             LinearLayoutManager(requireContext())
 
-        val sessions = listOf(
-
-            SessionDto(
-                sessionId = "1",
-                title = "Скалолазание",
-                description = "Тренировка для новичков",
-                type = "0",
-                durationMins = "90",
-                startDate = "28.05.2026 18:00",
-                price = "1500",
-                instructor = InstructorDto(
-                    instructorId = "1",
-                    name = "Анна",
-                    experienceYears = "5",
-                    rating = "4.9"
-                ),
-                bookingsCount = "10"
-            ),
-
-            SessionDto(
-                sessionId = "2",
-                title = "Боулдеринг",
-                description = "Средний уровень",
-                type = "Individual",
-                durationMins = "60",
-                startDate = "29.05.2026 20:00",
-                price = "2000",
-                instructor = InstructorDto(
-                    instructorId = "2",
-                    name = "Иван",
-                    experienceYears = "7",
-                    rating = "5.0"
-                ),
-                bookingsCount = "5"
-            )
-        )
-
-        recyclerView.adapter =
-            SessionAdapter(sessions)
+        getSessions()
 
         return view
+    }
+
+    fun getSessions() {
+        val request = RetrofitClient.api.getUserBookings() //создание, но не выполнение!
+        request.enqueue(object : Callback<List<SessionDto>> {
+            override fun onResponse(
+                call: Call<List<SessionDto>>,
+                response: Response<List<SessionDto>>
+            ) {
+                val instructor: List<SessionDto> = (response.body() ?: mutableListOf())
+                instructor.forEach { pr ->
+                    Log.d(
+                        "WWW",
+                        pr.title.toString() + " "
+                                + pr.description.toString() + " "
+                                + pr.type.toString() + " "
+                                + pr.durationMins.toString() + " "
+                                + pr.startDate.toString()
+                                + pr.price.toString()
+                                + pr.instructor.toString()
+                                + pr.bookingsCount.toString()
+                    )
+                    SessionList.add(pr)
+                }
+                // 4. Инициализация и подключение адаптера
+                val adapter = SessionAdapter(SessionList)
+                recyclerView.adapter = adapter
+            }
+
+            override fun onFailure(call: Call<List<SessionDto>>, t: Throwable) {
+                Log.d("WWW", "Error:\n" + t.message)
+            }
+        })
     }
 }

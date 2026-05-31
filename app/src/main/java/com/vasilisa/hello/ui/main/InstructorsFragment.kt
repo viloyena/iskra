@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.hello.R
+import com.vasilisa.hello.data.api.RetrofitClient
 import com.vasilisa.hello.data.api.ServerApi
 import com.vasilisa.hello.data.dto.InstructorDto
 import com.vasilisa.hello.data.dto.SessionDto
@@ -51,32 +52,31 @@ class InstructorsFragment : Fragment(R.layout.fragment_instructors) {
     }
 
     fun getInstructors() {
-        val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl("http://127.0.0.1:5246/") //адрес всегда должен заканчиваться на /
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val serverApi: ServerApi = retrofit.create(ServerApi::class.java)
-        val request = serverApi.getInstructors() //создание, но не выполнение!
+        val request = RetrofitClient.api.getInstructors()
         request.enqueue(object : Callback<List<InstructorDto>> {
-            override fun onResponse(call: Call<List<InstructorDto>>, response: Response<List<InstructorDto>>) {
+            override fun onResponse(
+                call: Call<List<InstructorDto>>,
+                response: Response<List<InstructorDto>>
+            ) {
                 val instructor: List<InstructorDto> = (response.body() ?: mutableListOf())
                 instructor.forEach { pr ->
-                    Log.d("WWW",pr.name.toString() + " "  + pr.experienceYears.toString() + " " + pr.rating.toString());
+                    Log.d(
+                        "WWW",
+                        pr.name.toString() + " "
+                                + pr.experienceYears.toString() + " "
+                                + pr.rating.toString()
+                    );
 
                     InstructorList.add(pr)
                 }
                 val adapter = InstructorAdapter(InstructorList)
                 recyclerViewInstructor.adapter = adapter
             }
+
             override fun onFailure(call: Call<List<InstructorDto>>, t: Throwable) {
-                Log.d("WWW", "Error:\n"+t.message)
+                Log.d("WWW", "Error:\n" + t.message)
             }
         })
 
     }
-   /* override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // список инструкторов
-    }*/
 }

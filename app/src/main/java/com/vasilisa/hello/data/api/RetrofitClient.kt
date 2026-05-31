@@ -1,3 +1,5 @@
+package com.vasilisa.hello.data.api
+
 import com.vasilisa.hello.data.api.JwtInterceptor
 import com.vasilisa.hello.data.api.ServerApi
 import okhttp3.OkHttpClient
@@ -6,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://10.34.183.85:5246/"
+    private const val BASE_URL = "http://localhost:5246/"
 
     var jwtToken: String? = null
 

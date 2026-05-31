@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.hello.R
 import com.vasilisa.hello.data.dto.SessionDto
@@ -15,8 +14,7 @@ class SessionAdapter(
     private val sessions: List<SessionDto>
 ) : RecyclerView.Adapter<SessionAdapter.SessionViewHolder>() {
 
-    class SessionViewHolder(view: View)
-        : RecyclerView.ViewHolder(view) {
+    class SessionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         val titleText: TextView =
             view.findViewById(R.id.titleText)
@@ -62,7 +60,7 @@ class SessionAdapter(
         holder.dateText.text =
             session.startDate
 
-        holder.actionButton.setOnClickListener {view ->
+        holder.actionButton.setOnClickListener { view ->
             // БЕРЕМ КОНТЕКСТ ИЗ view.context
             val context = view.context
 

@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.hello.R
+import com.vasilisa.hello.data.api.RetrofitClient
 import com.vasilisa.hello.data.api.ServerApi
 import com.vasilisa.hello.data.dto.InstructorDto
 import com.vasilisa.hello.data.dto.SessionDto
@@ -36,7 +37,7 @@ class ScheduleFragment : Fragment(R.layout.fragment_schedule) {
             false
         )
 
-         recyclerView =
+        recyclerView =
             view.findViewById<RecyclerView>(
                 R.id.rvSessions
             )
@@ -44,43 +45,42 @@ class ScheduleFragment : Fragment(R.layout.fragment_schedule) {
         recyclerView.layoutManager =
             LinearLayoutManager(requireContext())
 
-        getSchedule ();
-
+        getSchedule();
 
         return view
     }
 
-    fun getSchedule (){
-        val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl("http://127.0.0.1:5246/") //адрес всегда должен заканчиваться на /
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val serverApi: ServerApi = retrofit.create(ServerApi::class.java)
-
-
-        val request = serverApi.getSchedule() //создание, но не выполнение!
+    fun getSchedule() {
+        val request = RetrofitClient.api.getSchedule() //создание, но не выполнение!
         request.enqueue(object : Callback<List<SessionDto>> {
-            override fun onResponse(call: Call<List<SessionDto>>, response: Response<List<SessionDto>>) {
-                val instructor: List<SessionDto>  = (response.body() ?: mutableListOf())
+            override fun onResponse(
+                call: Call<List<SessionDto>>,
+                response: Response<List<SessionDto>>
+            ) {
+                val instructor: List<SessionDto> = (response.body() ?: mutableListOf())
                 instructor.forEach { pr ->
-                    Log.d("WWW",pr.title.toString() + " " + pr.description.toString() + " " + pr.type.toString() + " " + pr.durationMins.toString()+ " " + pr.startDate.toString() + pr.price.toString()+ pr.instructor.toString()+ pr.bookingsCount.toString())
+                    Log.d(
+                        "WWW",
+                        pr.title.toString() + " "
+                                + pr.description.toString() + " "
+                                + pr.type.toString() + " "
+                                + pr.durationMins.toString() + " "
+                                + pr.startDate.toString()
+                                + pr.price.toString()
+                                + pr.instructor.toString()
+                                + pr.bookingsCount.toString()
+                    )
                     SessionList.add(pr)
                 }
                 // 4. Инициализация и подключение адаптера
                 val adapter = SessionAdapter(SessionList)
                 recyclerView.adapter = adapter
             }
+
             override fun onFailure(call: Call<List<SessionDto>>, t: Throwable) {
-                Log.d("WWW", "Error:\n"+t.message)
+                Log.d("WWW", "Error:\n" + t.message)
             }
         })
 
     }
-    /*override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // тут будет:
-        // - список ВСЕХ тренировок
-        // - кнопка "записаться"
-    }*/
 }

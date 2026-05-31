@@ -11,6 +11,12 @@
         android:orientation="vertical"
         android:padding="24dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Регистрация"
+            android:textSize="24sp"
+            android:textStyle="bold"/>
         <EditText
             android:id="@+id/fullnameEdit"
             android:layout_width="match_parent"
@@ -27,24 +33,31 @@
             android:id="@+id/passwordEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Пароль"/>
+            android:hint="Пароль (не менее 8 символов)"/>
 
         <EditText
             android:id="@+id/phoneEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Телефон"/>
+            android:hint="Телефон (9876543210)"/>
 
         <EditText
             android:id="@+id/birthDateEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="2000-01-01"/>
+            android:hint="Дата рождения (2000-01-01)"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Пол"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"/>
 
         <Spinner
             android:id="@+id/genderSpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/registerButton"

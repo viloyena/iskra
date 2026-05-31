@@ -12,8 +12,7 @@ class InstructorAdapter(
     private val instructors: List<InstructorDto>
 ) : RecyclerView.Adapter<InstructorAdapter.InstructorViewHolder>() {
 
-    class InstructorViewHolder(view: View)
-        : RecyclerView.ViewHolder(view) {
+    class InstructorViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         val nameText: TextView =
             view.findViewById(R.id.nameText)

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.hello.data.dto.InstructorDto
 import com.vasilisa.hello.data.dto.SessionDto
 
-class ListAdapterInstructor (private val items: List<InstructorDto>) :
+class ListAdapterInstructor(private val items: List<InstructorDto>) :
     RecyclerView.Adapter<ListAdapterInstructor.ViewHolder>() {
 
     // Класс для хранения ссылок на элементы разметки одной строки
