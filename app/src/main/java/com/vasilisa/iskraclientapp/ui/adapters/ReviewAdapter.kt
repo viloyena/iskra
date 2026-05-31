@@ -13,24 +13,56 @@ class ReviewAdapter(
 ) : RecyclerView.Adapter<ReviewAdapter.ReviewVH>() {
 
     class ReviewVH(view: View) : RecyclerView.ViewHolder(view) {
-        val comment: TextView = view.findViewById(R.id.commentText)
-        val rating: TextView = view.findViewById(R.id.ratingText)
+
+        val userName: TextView =
+            view.findViewById(R.id.userNameText)
+
+        val date: TextView =
+            view.findViewById(R.id.dateText)
+
+        val comment: TextView =
+            view.findViewById(R.id.commentText)
+
+        val rating: TextView =
+            view.findViewById(R.id.ratingText)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewVH {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ReviewVH {
+
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_review, parent, false)
+            .inflate(
+                R.layout.item_review,
+                parent,
+                false
+            )
+
         return ReviewVH(view)
     }
 
-    override fun onBindViewHolder(holder: ReviewVH, position: Int) {
+    override fun onBindViewHolder(
+        holder: ReviewVH,
+        position: Int
+    ) {
+
         val review = reviews[position]
 
-        holder.comment.text = review.comment ?: "Без комментария"
-        holder.rating.text = "⭐ ${review.rating}"
+        holder.userName.text = review.author
+
+        holder.rating.text =
+            "Рейтинг: ${review.rating}/5"
+
+        holder.date.text = review.date
+
+        holder.comment.text =
+            review.comment ?: "Без комментария"
     }
 
-    override fun getItemCount() = reviews.size
+    override fun getItemCount(): Int {
+        return reviews.size
+    }
 
     fun update(newList: List<ReviewDto>) {
         reviews = newList

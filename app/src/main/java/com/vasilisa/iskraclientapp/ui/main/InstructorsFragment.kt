@@ -58,7 +58,7 @@ class InstructorsFragment : Fragment(R.layout.fragment_instructors) {
                 instructor.forEach { pr ->
                     Log.d(
                         "WWW",
-                        pr.name.toString() + " "
+                        pr.fullname.toString() + " "
                                 + pr.experienceYears.toString() + " "
                                 + pr.rating.toString()
                     );

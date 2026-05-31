@@ -43,7 +43,7 @@ class InstructorAdapter(
     override fun onBindViewHolder(holder: InstructorViewHolder, position: Int) {
         val instructor = instructors[position]
 
-        holder.nameText.text = instructor.name
+        holder.nameText.text = instructor.fullname
         holder.experienceText.text = "Опыт: ${instructor.experienceYears}"
         holder.ratingText.text = "Рейтинг: ${instructor.rating}"
 

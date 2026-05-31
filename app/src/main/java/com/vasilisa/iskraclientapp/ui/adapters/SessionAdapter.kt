@@ -35,7 +35,7 @@ class SessionAdapter(
         val session = sessions[position]
 
         holder.titleText.text = session.title
-        holder.instructorText.text = session.instructor.name
+        holder.instructorText.text = session.instructor.fullname
         holder.dateText.text = session.startDate
 
         holder.actionButton.text = buttonText

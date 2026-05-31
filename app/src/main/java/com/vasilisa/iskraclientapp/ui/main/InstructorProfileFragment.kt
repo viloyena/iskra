@@ -1,6 +1,7 @@
 package com.vasilisa.iskraclientapp.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.iskraclientapp.R
 import com.vasilisa.iskraclientapp.data.api.RetrofitClient
+import com.vasilisa.iskraclientapp.data.dto.CreateReviewDto
 import com.vasilisa.iskraclientapp.data.dto.InstructorDto
 import com.vasilisa.iskraclientapp.data.dto.ReviewDto
 import com.vasilisa.iskraclientapp.ui.adapters.ReviewAdapter
@@ -29,9 +31,14 @@ class InstructorProfileFragment : Fragment(R.layout.fragment_instructor_profile)
 
         instructorId = arguments?.getString("instructorId") ?: return
 
-        val nameText = view.findViewById<TextView>(R.id.nameText)
-        val expText = view.findViewById<TextView>(R.id.experienceText)
-        val ratingText = view.findViewById<TextView>(R.id.ratingText)
+        val nameText =
+            view.findViewById<TextView>(R.id.profileNameText)
+
+        val expText =
+            view.findViewById<TextView>(R.id.profileExperienceText)
+
+        val ratingText =
+            view.findViewById<TextView>(R.id.profileRatingText)
 
         val recycler = view.findViewById<RecyclerView>(R.id.reviewsRv)
         val commentInput = view.findViewById<EditText>(R.id.commentInput)
@@ -72,7 +79,12 @@ class InstructorProfileFragment : Fragment(R.layout.fragment_instructor_profile)
         }
     }
 
-    private fun loadInstructor(name: TextView, exp: TextView, rating: TextView) {
+    private fun loadInstructor(
+        name: TextView,
+        exp: TextView,
+        rating: TextView
+    ) {
+
         RetrofitClient.create(requireContext())
             .getInstructor(instructorId)
             .enqueue(object : Callback<InstructorDto> {
@@ -81,18 +93,37 @@ class InstructorProfileFragment : Fragment(R.layout.fragment_instructor_profile)
                     call: Call<InstructorDto>,
                     response: Response<InstructorDto>
                 ) {
-                    val data = response.body() ?: return
 
-                    name.text = data.name
+                    Log.d("WWW", "CODE = ${response.code()}")
+
+                    if (!response.isSuccessful) {
+                        return
+                    }
+
+                    val data = response.body()
+
+                    Log.d("WWW", "DATA = $data")
+
+                    if (data == null) {
+                        return
+                    }
+
+                    name.text = data.fullname
                     exp.text = "Опыт: ${data.experienceYears}"
                     rating.text = "Рейтинг: ${data.rating}"
                 }
 
-                override fun onFailure(call: Call<InstructorDto>, t: Throwable) {}
+                override fun onFailure(
+                    call: Call<InstructorDto>,
+                    t: Throwable
+                ) {
+                    Log.d("WWW", t.message.toString())
+                }
             })
     }
 
     private fun loadReviews() {
+
         RetrofitClient.create(requireContext())
             .getReviews(instructorId)
             .enqueue(object : Callback<List<ReviewDto>> {
@@ -101,16 +132,24 @@ class InstructorProfileFragment : Fragment(R.layout.fragment_instructor_profile)
                     call: Call<List<ReviewDto>>,
                     response: Response<List<ReviewDto>>
                 ) {
-                    adapter.update(response.body() ?: emptyList())
+
+                    val reviews = response.body() ?: emptyList()
+
+                    Log.d("WWW", reviews.toString())
+
+                    adapter.update(reviews)
                 }
 
-                override fun onFailure(call: Call<List<ReviewDto>>, t: Throwable) {}
+                override fun onFailure(
+                    call: Call<List<ReviewDto>>,
+                    t: Throwable
+                ) {}
             })
     }
 
     private fun sendReview(comment: EditText, ratingBar: RatingBar) {
 
-        val dto = ReviewDto(
+        val dto = CreateReviewDto(
             instructorId = instructorId,
             rating = ratingBar.rating.toInt(),
             comment = comment.text.toString()
