@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
 
     private const val BASE_URL =
-        "http://localhost:5246/"
+        "http://localhost:5000/"
 
     fun create(context: Context): ServerApi {
 

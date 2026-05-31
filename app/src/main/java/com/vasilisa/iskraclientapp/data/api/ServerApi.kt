@@ -1,5 +1,6 @@
 package com.vasilisa.iskraclientapp.data.api
 
+import com.vasilisa.iskraclientapp.data.dto.CreateReviewDto
 import com.vasilisa.iskraclientapp.data.dto.InstructorDto
 import com.vasilisa.iskraclientapp.data.dto.LoginRequestDto
 import com.vasilisa.iskraclientapp.data.dto.LoginResponseDto
@@ -50,7 +51,7 @@ interface ServerApi {
 
     @POST("user/review")
     fun postReview(
-        @Body dto: ReviewDto
+        @Body dto: CreateReviewDto
     ): Call<Void>
 
     @DELETE("user/review/{instructorId}")

@@ -54,6 +54,7 @@ class InstructorsFragment : Fragment(R.layout.fragment_instructors) {
                 response: Response<List<InstructorDto>>
             ) {
                 val instructor: List<InstructorDto> = (response.body() ?: mutableListOf())
+                InstructorList.clear()
                 instructor.forEach { pr ->
                     Log.d(
                         "WWW",

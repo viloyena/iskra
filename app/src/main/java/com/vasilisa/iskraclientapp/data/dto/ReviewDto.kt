@@ -1,7 +1,9 @@
 package com.vasilisa.iskraclientapp.data.dto
 
 data class ReviewDto(
-    val instructorId: String,
-    val rating: Int,
-    val comment: String?
+    val authorId: String,
+    val author: String,
+    val rating: String,
+    val comment: String?,
+    val date: String
 )
