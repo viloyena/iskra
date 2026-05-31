@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.iskraclientapp.R
 import com.vasilisa.iskraclientapp.data.dto.SessionDto
+import com.vasilisa.iskraclientapp.data.shared.DateFormatter
 
 class SessionAdapter(
     private val sessions: List<SessionDto>,
@@ -36,7 +37,7 @@ class SessionAdapter(
 
         holder.titleText.text = session.title
         holder.instructorText.text = session.instructor.fullname
-        holder.dateText.text = session.startDate
+        holder.dateText.text = DateFormatter.format(session.startDate)
 
         holder.actionButton.text = buttonText
 

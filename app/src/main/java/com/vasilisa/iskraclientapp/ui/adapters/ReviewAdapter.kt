@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vasilisa.iskraclientapp.R
 import com.vasilisa.iskraclientapp.data.dto.ReviewDto
+import com.vasilisa.iskraclientapp.data.shared.DateFormatter
 
 class ReviewAdapter(
     private var reviews: List<ReviewDto>
@@ -54,7 +55,7 @@ class ReviewAdapter(
         holder.rating.text =
             "Рейтинг: ${review.rating}/5"
 
-        holder.date.text = review.date
+        holder.date.text = DateFormatter.format(review.date)
 
         holder.comment.text =
             review.comment ?: "Без комментария"
